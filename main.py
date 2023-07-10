@@ -16,7 +16,7 @@ def calcPixel(im, display, nosieThreshold):
     data = list(im.getdata())
     for idx in range(0, len(data)):
         r, g, b = data[idx]
-        light = r*0.30+g*0.59+b*0.11
+        light = r*0.299+g*0.587+b*0.114
         if light > 250:
             x, y = getCoordinate(idx, horizontal)
             if display:
