@@ -27,7 +27,7 @@ def calcPixel(im, display, nosieThreshold):
             nosieNum += 1
     table = PrettyTable(['position', 'kind', 'value'])
     for k, v in dic.items():
-        x, y = getCoordinate(idx, horizontal)
+        x, y = getCoordinate(k, horizontal)
         table.add_row([(x, y), v[0], v[1]])
 
     if display:
