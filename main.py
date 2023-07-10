@@ -9,7 +9,7 @@ def getCoordinate(index, hor):
     return index / hor, index % hor
 
 
-def calcPixel(im, display):
+def calcPixel(im, display, nosieThreshold):
     horizontal = im.size[0]
     defectiveNum = 0
     nosieNum = 0
@@ -23,7 +23,7 @@ def calcPixel(im, display):
                 print("position (%d,%d) defective pixel, value %d" %
                       (x, y, light))
             defectiveNum += 1
-        elif light > 180:
+        elif light > nosieThreshold:
             x, y = getCoordinate(idx, horizontal)
             if display:
                 print("position (%d,%d) nosie pixel, value %d" %
@@ -36,26 +36,24 @@ def printExif(im):
     print("format %s, mode %s " % (im.format, im.mode))
     print("pixel size", im.size)
     exif = im._getexif()
-    dic = {}
+    dic = {'ISOSpeedRatings': 1, 'ExposureTime': 1, 'FNumber': 1, 'Model': 1,
+           'LensModel': 1}
     for k, v in exif.items():
         if k in PIL.ExifTags.TAGS:
             tagVal = PIL.ExifTags.TAGS[k]
-            if tagVal == "ISOSpeedRatings":
-                dic["ISOSpeedRatings"] = v
-            if tagVal == "ExposureTime":
-                dic["ExposureTime"] = v
-            if tagVal == "Model":
-                dic["Model"] = v
-            if tagVal == "DateTime":
-                dic["DateTime"] = v
+            if tagVal in dic:
+                if tagVal == "LensModel":
+                    v = v.replace('\x00', '')
+                dic[tagVal] = v
     print(dic)
 
 
 def main(argv):
     file = ""
     displayDetail = False
+    nosieThreshold = 60
     try:
-        opts, args = getopt.getopt(argv, "f:d", ["file=", "detail"])
+        opts, args = getopt.getopt(argv, "f:dn:", ["file=", "detail", "nosie"])
     except getopt.GetoptError:
         print('test.py -f <inputfile>')
         sys.exit(2)
@@ -64,10 +62,15 @@ def main(argv):
             file = arg
         if opt in ("-d", "--detail"):
             displayDetail = True
-    print("read image %s" % file)
+        if opt in ("-n", "--nosie"):
+            nosieThreshold = int(arg)
+    if len(file) == 0:
+        print("should spcify the file name")
+        sys.exit(2)
+    print("{read image %s}" % file)
     im = Image.open(file)
     printExif(im)
-    calcPixel(im, displayDetail)
+    calcPixel(im, displayDetail, nosieThreshold)
 
 
 if __name__ == "__main__":
