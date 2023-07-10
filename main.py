@@ -2,6 +2,7 @@ import PIL.ExifTags
 import sys
 import getopt
 
+from prettytable import PrettyTable
 from PIL import Image
 
 
@@ -13,22 +14,24 @@ def calcPixel(im, display, nosieThreshold):
     horizontal = im.size[0]
     defectiveNum = 0
     nosieNum = 0
+    dic = {}
     data = list(im.getdata())
     for idx in range(0, len(data)):
         r, g, b = data[idx]
         light = r*0.299+g*0.587+b*0.114
         if light > 250:
-            x, y = getCoordinate(idx, horizontal)
-            if display:
-                print("position (%d,%d) defective pixel, value %d" %
-                      (x, y, light))
+            dic[idx] = ("defective", light)
             defectiveNum += 1
         elif light > nosieThreshold:
-            x, y = getCoordinate(idx, horizontal)
-            if display:
-                print("position (%d,%d) nosie pixel, value %d" %
-                      (x, y, light))
+            dic[idx] = ("nosie", light)
             nosieNum += 1
+    table = PrettyTable(['position', 'kind', 'value'])
+    for k, v in dic.items():
+        x, y = getCoordinate(idx, horizontal)
+        table.add_row([(x, y), v[0], v[1]])
+
+    if display:
+        print(table)
     print("defective pixel %d nosie poxel %d" % (defectiveNum, nosieNum))
 
 
@@ -45,7 +48,11 @@ def printExif(im):
                 if tagVal == "LensModel":
                     v = v.replace('\x00', '')
                 dic[tagVal] = v
-    print(dic)
+
+    table = PrettyTable(['parameter', 'value'])
+    for k, v in dic.items():
+        table.add_row([k, v])
+    print(table)
 
 
 def main(argv):
