@@ -1,5 +1,5 @@
 
-simple tool to check the nosie and defective pixel on picture.
+simple tool to check the defective pixel on picture.
 
 should install the pil library first.
 ```
