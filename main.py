@@ -40,7 +40,7 @@ def printExif(im):
     print("pixel size", im.size)
     exif = im._getexif()
     dic = {'ISOSpeedRatings': 1, 'ExposureTime': 1, 'FNumber': 1, 'Model': 1,
-           'LensModel': 1}
+           'LensModel': 1, "FocalLengthIn35mmFilm": 1}
     for k, v in exif.items():
         if k in PIL.ExifTags.TAGS:
             tagVal = PIL.ExifTags.TAGS[k]
