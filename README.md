@@ -1,5 +1,5 @@
 
-simple tool to check the defective pixel on picture.
+Simple tool to check the defective pixel in the image.
 
 should install the pil library first.
 ```
